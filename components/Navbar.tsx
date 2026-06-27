@@ -115,7 +115,13 @@ export default function Navbar() {
             >
               Book
             </Link>
-
+            <Link
+  href="/about"
+  onClick={() => setMenuOpen(false)}
+  className="text-zinc-400 hover:text-white"
+>
+  About
+</Link>
             <a
               href="https://www.youtube.com/@LearningNow25"
               target="_blank"

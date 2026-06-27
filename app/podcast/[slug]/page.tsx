@@ -25,7 +25,9 @@ export async function generateMetadata({
     description:
       episode.summary ||
       `Listen to ${episode.title} featuring ${episode.guest} on LearningNow Podcast.`,
-
+    alternates: {
+  canonical: `https://learningnow.in/podcast/${episode.slug}`,
+},
     keywords: episode.keywords,
 
     openGraph: {
@@ -33,11 +35,15 @@ export async function generateMetadata({
       description:
         episode.summary ||
         `Listen to ${episode.title} featuring ${episode.guest}.`,
+        url: `https://learningnow.in/podcast/${episode.slug}`,
       images: [
-        {
-          url: episode.thumbnail,
-        },
-      ],
+  {
+    url: `https://learningnow.in${episode.thumbnail}`,
+    width: 1200,
+    height: 630,
+    alt: episode.title,
+  },
+],
     },
 
     twitter: {
@@ -46,7 +52,9 @@ export async function generateMetadata({
       description:
         episode.summary ||
         `Listen to ${episode.title} featuring ${episode.guest}.`,
-      images: [episode.thumbnail],
+      images: [
+  `https://learningnow.in${episode.thumbnail}`,
+],
     },
   };
 }
