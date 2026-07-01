@@ -1,10 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+import NavbarGuest from "./NavbarGuest";
+import NavbarUser from "./NavbarUser";
+import { getCurrentUser } from "@/modules/authentication/services/user.service";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    async function checkUser() {
+      const user = await getCurrentUser();
+      setLoggedIn(!!user);
+    }
+
+    checkUser();
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-zinc-800/80 bg-black/60 backdrop-blur-xl">
@@ -23,7 +37,7 @@ export default function Navbar() {
             />
 
             <div className="leading-tight">
-              <h2 className="text-xl md:text-xl font-semibold text-white tracking-tight">
+              <h2 className="text-xl font-semibold text-white tracking-tight">
                 LearningNow
               </h2>
 
@@ -33,44 +47,43 @@ export default function Navbar() {
             </div>
           </Link>
 
+          {/* Desktop */}
+
           <div className="hidden md:flex items-center gap-8">
 
             <Link
               href="/podcast"
-              className="text-zinc-400 hover:text-white transition-colors duration-300"
+              className="text-zinc-400 hover:text-white transition-colors"
             >
               Podcast
             </Link>
 
             <Link
               href="/communication"
-              className="text-zinc-400 hover:text-white transition-colors duration-300"
+              className="text-zinc-400 hover:text-white transition-colors"
             >
               Communication
             </Link>
 
             <Link
               href="/book"
-              className="text-zinc-400 hover:text-white transition-colors duration-300"
+              className="text-zinc-400 hover:text-white transition-colors"
             >
               Book
             </Link>
-          <Link
-  href="/about"
-  className="hover:text-white transition"
->
-  About
-</Link>
-            <a
-              href="https://www.youtube.com/@LearningNow25"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white hover:bg-zinc-200 text-black px-5 py-2.5 rounded-xl font-medium transition-all duration-300 hover:scale-[1.03]"
+
+            <Link
+              href="/about"
+              className="text-zinc-400 hover:text-white transition-colors"
             >
-              Subscribe
-            </a>
+              About
+            </Link>
+
+            {loggedIn ? <NavbarUser /> : <NavbarGuest />}
 
           </div>
+
+          {/* Mobile Menu Button */}
 
           <button
             className="md:hidden text-white text-2xl"
@@ -80,6 +93,8 @@ export default function Navbar() {
           </button>
 
         </div>
+
+        {/* Mobile Menu */}
 
         {menuOpen && (
           <div className="md:hidden mt-5 border-t border-zinc-800 pt-5 flex flex-col gap-5">
@@ -115,21 +130,16 @@ export default function Navbar() {
             >
               Book
             </Link>
+
             <Link
-  href="/about"
-  onClick={() => setMenuOpen(false)}
-  className="text-zinc-400 hover:text-white"
->
-  About
-</Link>
-            <a
-              href="https://www.youtube.com/@LearningNow25"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white hover:bg-zinc-200 text-black px-4 py-3 rounded-xl font-medium text-center transition-all duration-300"
+              href="/about"
+              onClick={() => setMenuOpen(false)}
+              className="text-zinc-400 hover:text-white"
             >
-              Subscribe
-            </a>
+              About
+            </Link>
+
+            {loggedIn ? <NavbarUser /> : <NavbarGuest />}
 
           </div>
         )}
