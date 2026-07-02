@@ -17,7 +17,7 @@ export function useAuth() {
       await signUp(data);
 
       alert(
-        "🎉 Account created successfully!\n\nPlease verify your email before logging in."
+        "🎉 Account created successfully!\\"
       );
 
       window.location.href = "/auth/login";

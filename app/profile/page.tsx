@@ -1,80 +1,127 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
 
-export default async function ProfilePage() {
-  const supabase = await createClient();
+import { useEffect, useState } from "react";
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import PersonalInfoForm from "@/components/profile/PersonalInfoForm";
+import AccountInfo from "@/components/profile/AccountInfo";
+import AboutSection from "@/components/profile/AboutSection";
+import SaveButton from "@/components/profile/SaveButton";
+
+import { getCurrentUser } from "@/modules/authentication/services/user.service";
+import {
+  getProfile,
+  updateProfile,
+} from "@/modules/authentication/services/profile.service";
+
+export default function ProfilePage() {
+  const [profile, setProfile] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  async function loadProfile() {
+    try {
+      setLoading(true);
+
+      const user = await getCurrentUser();
+
+      if (!user) {
+        return;
+      }
+
+      const profileData = await getProfile(user.id);
+
+      setProfile({
+        ...profileData,
+        email: user.email,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSave() {
+    if (!profile) return;
+
+    try {
+      setSaving(true);
+
+      await updateProfile(profile.id, {
+        full_name: profile.full_name,
+        username: profile.username,
+        bio: profile.bio,
+        country: profile.country,
+        phone: profile.phone,
+        website: profile.website,
+        avatar_url: profile.avatar_url,
+      });
+
+      alert("✅ Profile updated successfully.");
+
+      await loadProfile();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center text-white text-xl">
+        Loading Profile...
+      </main>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center text-red-500 text-xl">
+        Failed to load profile.
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center px-6">
-      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+    <main className="min-h-screen bg-black text-white py-12 px-4">
 
-        <h1 className="text-4xl font-bold text-white mb-2">
-          My Profile
-        </h1>
+      <div className="max-w-5xl mx-auto space-y-8">
 
-        <p className="text-zinc-400 mb-8">
-          This page is reading your session directly from Supabase.
-        </p>
+        <ProfileHeader
+          profile={profile}
+          setProfile={setProfile}
+        />
 
-        {user ? (
-          <div className="space-y-5">
+        <PersonalInfoForm
+          profile={profile}
+          setProfile={setProfile}
+        />
 
-            <div>
-              <p className="text-zinc-500 text-sm">Email</p>
-              <p className="text-white text-lg">
-                {user.email}
-              </p>
-            </div>
+        <AccountInfo
+          profile={profile}
+        />
 
-            <div>
-              <p className="text-zinc-500 text-sm">User ID</p>
-              <p className="text-white break-all">
-                {user.id}
-              </p>
-            </div>
+        <AboutSection
+          profile={profile}
+          setProfile={setProfile}
+        />
 
-            <div>
-              <p className="text-zinc-500 text-sm">Email Verified</p>
-              <p className="text-green-400">
-                {user.email_confirmed_at ? "Yes ✅" : "No ❌"}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-zinc-500 text-sm">Created At</p>
-              <p className="text-white">
-                {new Date(user.created_at).toLocaleString()}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-zinc-500 text-sm">Last Sign In</p>
-              <p className="text-white">
-                {user.last_sign_in_at
-                  ? new Date(user.last_sign_in_at).toLocaleString()
-                  : "Never"}
-              </p>
-            </div>
-
-          </div>
-        ) : (
-          <div className="text-center py-10">
-
-            <h2 className="text-2xl font-semibold text-red-400 mb-4">
-              No Active Session
-            </h2>
-
-            <p className="text-zinc-400">
-              You are currently not logged in.
-            </p>
-
-          </div>
-        )}
+        <SaveButton
+          loading={saving}
+          onSave={handleSave}
+        />
 
       </div>
+
     </main>
   );
 }
