@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { SignUpData, LoginData } from "../types/auth.types";
+import { LoginData, SignUpData } from "../types/auth.types";
 
 export async function signUp(data: SignUpData) {
   const { data: authData, error } = await supabase.auth.signUp({
@@ -12,9 +12,7 @@ export async function signUp(data: SignUpData) {
     },
   });
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   return authData;
 }
@@ -26,9 +24,7 @@ export async function login(data: LoginData) {
       password: data.password,
     });
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   return authData;
 }
@@ -36,7 +32,21 @@ export async function login(data: LoginData) {
 export async function logout() {
   const { error } = await supabase.auth.signOut();
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
+}
+
+export async function forgotPassword(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+   redirectTo: `${window.location.origin}/auth/reset-password`,
+  });
+
+  if (error) throw error;
+}
+
+export async function resetPassword(password: string) {
+  const { error } = await supabase.auth.updateUser({
+    password,
+  });
+
+  if (error) throw error;
 }

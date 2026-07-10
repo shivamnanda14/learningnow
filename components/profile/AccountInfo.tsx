@@ -105,7 +105,7 @@ export default function AccountInfo({ profile }: Props) {
 
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-600/20 border border-purple-500/30 text-purple-300">
+          <div className="inline-flex items-center gap-4 px-5 py-1 rounded-full bg-purple-600/20 border border-purple-500/30 text-purple-300">
 
             <BadgeCheck size={16} />
 

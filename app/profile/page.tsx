@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import PersonalInfoForm from "@/components/profile/PersonalInfoForm";
@@ -20,6 +20,14 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   const [saving, setSaving] = useState(false);
+  const editSectionRef = useRef<HTMLDivElement>(null);
+
+function scrollToEdit() {
+  editSectionRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
 
   useEffect(() => {
     loadProfile();
@@ -97,14 +105,17 @@ export default function ProfilePage() {
       <div className="max-w-5xl mx-auto space-y-8">
 
         <ProfileHeader
-          profile={profile}
-          setProfile={setProfile}
-        />
+  profile={profile}
+  setProfile={setProfile}
+  onEditClick={scrollToEdit}
+/>
 
-        <PersonalInfoForm
-          profile={profile}
-          setProfile={setProfile}
-        />
+        <div ref={editSectionRef}>
+  <PersonalInfoForm
+    profile={profile}
+    setProfile={setProfile}
+  />
+</div>
 
         <AccountInfo
           profile={profile}

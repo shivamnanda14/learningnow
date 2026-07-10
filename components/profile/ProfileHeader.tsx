@@ -1,56 +1,63 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { Camera, CalendarDays } from "lucide-react";
 import { useRef, useState } from "react";
+
+import {
+  Camera,
+  CalendarDays,
+  Globe,
+  MapPin,
+} from "lucide-react";
 
 import {
   uploadAvatar,
   updateAvatarUrl,
 } from "@/modules/authentication/services/profile.service";
 
-type Profile = {
-  id: string;
-  full_name: string;
-  username?: string;
-  avatar_url?: string;
-  email?: string;
-  created_at?: string;
-};
-
-type ProfileProps = {
-  profile: Profile;
+type Props = {
+  profile: any;
   setProfile: React.Dispatch<React.SetStateAction<any>>;
+  onEditClick: () => void;
 };
 
 export default function ProfileHeader({
   profile,
   setProfile,
-}: ProfileProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  onEditClick,
+}: Props) {
 
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef =
+    useRef<HTMLInputElement>(null);
 
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] =
+    useState(false);
+
+  const [previewImage, setPreviewImage] =
+    useState<string | null>(null);
 
   async function handleImageSelect(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
     try {
+
       const file = e.target.files?.[0];
 
       if (!file) return;
 
       setUploading(true);
 
-      const localPreview = URL.createObjectURL(file);
+      const localPreview =
+        URL.createObjectURL(file);
 
       setPreviewImage(localPreview);
 
-      const avatarUrl = await uploadAvatar(profile.id, file);
+      const avatarUrl =
+        await uploadAvatar(profile.id, file);
 
-      await updateAvatarUrl(profile.id, avatarUrl);
+      await updateAvatarUrl(
+        profile.id,
+        avatarUrl
+      );
 
       setProfile((prev: any) => ({
         ...prev,
@@ -58,139 +65,334 @@ export default function ProfileHeader({
       }));
 
       setPreviewImage(null);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to upload profile picture.");
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert(
+        "Failed to upload profile picture."
+      );
+
     } finally {
+
       setUploading(false);
+
     }
   }
+
+  const imageSrc =
+    previewImage ||
+    profile.avatar_url ||
+    "/profile/default-avatar.png";
 
   const username =
     profile.username ||
     profile.email?.split("@")[0] ||
     "username";
 
-  const joinedDate = profile.created_at
-    ? new Date(profile.created_at).toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "Recently Joined";
-   console.log("PROFILE DATA", profile);
-console.log("AVATAR URL", profile.avatar_url);
+  const joined =
+    profile.created_at
+      ? new Date(
+          profile.created_at
+        ).toLocaleDateString(
+          "en-IN",
+          {
+            month: "long",
+            year: "numeric",
+          }
+        )
+      : "Recently Joined";
+
   return (
-    <section className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-10">
 
-      <div className="flex flex-col lg:flex-row gap-10 items-center">
+    <section
+      className="
+        overflow-hidden
+        rounded-3xl
+        border
+        border-zinc-800
+        bg-zinc-950
+        shadow-2xl
+      "
+    >
 
-        {/* ================= Profile Image ================= */}
+      {/* ================= Banner ================= */}
 
-        <div className="relative">
+      <div className="relative h-56 md:h-72 overflow-hidden">
 
-          <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-zinc-700 bg-zinc-800">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-700 via-violet-600 to-zinc-900" />
 
-            <img
-  src={
-    previewImage ||
-    profile.avatar_url ||
-    "/profile/default-avatar.png"
-  }
-  alt="Profile"
-  className="w-full h-full object-cover"
-/>
+        <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
 
-          </div>
+        <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl" />
 
-          <button
-            type="button"
-            disabled={uploading}
-            onClick={() => fileInputRef.current?.click()}
-            className="
-              absolute
-              bottom-3
-              right-3
-              w-12
-              h-12
-              rounded-full
-              bg-purple-600
-              hover:bg-purple-500
-              transition
-              flex
-              items-center
-              justify-center
-              shadow-lg
-              disabled:opacity-50
-            "
-          >
-            <Camera size={20} />
-          </button>
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px)",
+            backgroundSize:
+              "42px 42px",
+          }}
+        />
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageSelect}
-          />
+      </div>
 
-        </div>
+      {/* ================= Content ================= */}
 
-        {/* ================= User Details ================= */}
+      <div
+        className="
+          px-8
+          md:px-12
+          py-10
+        "
+      >
 
-        <div className="flex-1 text-center lg:text-left">
+        <div
+          className="
+            flex
+            flex-col-reverse
+            lg:flex-row
+            items-start
+            gap-12
+          "
+        >
 
-          <h1 className="text-4xl md:text-5xl font-bold">
-            {profile.full_name}
-          </h1>
+          {/* LEFT */}
 
-          <p className="text-purple-400 mt-2 text-lg">
-            @{username}
-          </p>
+          <div className="flex-1">
 
-          <p className="text-zinc-400 mt-5 max-w-2xl leading-7">
-            Manage your profile, account settings and your complete
-            LearningNow journey from one place.
-          </p>
+            <h1
+              className="
+                text-4xl
+                md:text-5xl
+                font-bold
+                tracking-tight
+              "
+            >
+              {profile.full_name}
+            </h1>
 
-          <div className="flex flex-col sm:flex-row gap-5 mt-8">
+            <p
+              className="
+                mt-2
+                text-lg
+                text-purple-400
+              "
+            >
+              @{username}
+            </p>
 
-            <div className="bg-black border border-zinc-800 rounded-2xl px-6 py-5 min-w-[180px]">
+            <p
+              className="
+                mt-6
+                max-w-3xl
+                text-zinc-400
+                leading-8
+                text-[17px]
+              "
+            >
+              {profile.bio?.trim()
+                ? profile.bio
+                : "Tell people about yourself. Share your journey, interests and what you're building."}
+            </p>
 
-              <div className="flex items-center gap-2 text-zinc-500 text-sm">
+            <div
+              className="
+                mt-8
+                flex
+                flex-wrap
+                gap-3
+              "
+            >              <div className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-5 py-3">
 
-                <CalendarDays size={16} />
+                <MapPin
+                  size={18}
+                  className="text-purple-400"
+                />
 
-                <span>Joined</span>
+                <span className="text-zinc-300">
+                  {profile.country || "Not Specified"}
+                </span>
 
               </div>
 
-              <h3 className="font-semibold text-lg mt-3">
-                {joinedDate}
-              </h3>
+              {profile.website && (
+
+                <a
+                  href={profile.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    border
+                    border-zinc-800
+                    bg-zinc-900
+                    px-5
+                    py-3
+                    hover:border-purple-500
+                    transition
+                  "
+                >
+
+                  <Globe
+                    size={18}
+                    className="text-purple-400"
+                  />
+
+                  <span className="text-zinc-300 truncate max-w-[180px]">
+
+                    {profile.website
+                      .replace("https://", "")
+                      .replace("http://", "")}
+
+                  </span>
+
+                </a>
+
+              )}
+
+              <div className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-5 py-3">
+
+                <CalendarDays
+                  size={18}
+                  className="text-purple-400"
+                />
+
+                <span className="text-zinc-300">
+
+                  Joined {joined}
+
+                </span>
+
+              </div>
 
             </div>
 
-            <Link
-              href="/masterclass"
-              className="
-                bg-purple-600
-                hover:bg-purple-500
-                transition
-                rounded-2xl
-                px-8
-                py-5
-                font-semibold
-                flex
-                items-center
-                justify-center
-                shadow-lg
-                shadow-purple-500/20
-              "
-            >
-              Explore Masterclass
-            </Link>
+            {/* Buttons */}
+
+            <div className="mt-10 flex flex-wrap gap-4">
+
+              <button
+              onClick={onEditClick}
+                className="
+                  rounded-xl
+                  bg-purple-600
+                  px-6
+                  py-3
+                  font-semibold
+                  hover:bg-purple-500
+                  transition
+                "
+              >
+                Edit Profile
+              </button>
+
+              <a
+                href="/masterclass"
+                className="
+                  rounded-xl
+                  border
+                  border-zinc-700
+                  px-6
+                  py-3
+                  font-semibold
+                  hover:border-purple-500
+                  transition
+                "
+              >
+                Explore Masterclass
+              </a>
+
+            </div>
+
+          </div>
+
+          {/* ================= RIGHT ================= */}
+
+          <div
+            className="
+              w-full
+              lg:w-auto
+              flex
+              justify-center
+              lg:justify-end
+            "
+          >
+
+            <div className="relative">
+
+              <div
+                onClick={() =>
+                  fileInputRef.current?.click()
+                }
+               className="
+group
+relative
+w-40
+h-40
+lg:w-44
+lg:h-44
+rounded-full
+overflow-hidden
+border-[5px]
+border-zinc-800
+bg-zinc-900
+shadow-2xl
+cursor-pointer
+"
+              >
+
+                <img
+                  src={imageSrc}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+
+                <div
+                  className={`
+                    absolute
+                    inset-0
+                    bg-black/60
+                    flex
+                    flex-col
+                    items-center
+                    justify-center
+                    transition
+                    ${
+                      uploading
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }
+                  `}
+                >
+
+                  <Camera size={30} />
+
+                  <span className="mt-3 font-medium">
+
+                    {uploading
+                      ? "Uploading..."
+                      : "Change Photo"}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+              <input
+                ref={fileInputRef}
+                hidden
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+              />            </div>
 
           </div>
 
@@ -199,5 +401,6 @@ console.log("AVATAR URL", profile.avatar_url);
       </div>
 
     </section>
+
   );
 }

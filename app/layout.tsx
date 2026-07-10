@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+
 import StructuredData from "../components/StructuredData";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -151,13 +154,19 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-black text-white">
         <StructuredData />
+
         <Navbar />
 
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
 
         <Footer />
+
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          theme="dark"
+        />
       </body>
     </html>
   );

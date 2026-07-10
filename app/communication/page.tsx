@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-
+import LearningPaths from "@/components/communication/LearningPaths";
 export default function CommunicationPage() {
   const learnings = [
     "Communication Mindset",
@@ -70,6 +70,8 @@ export default function CommunicationPage() {
         </motion.div>
 
       </section>
+
+<LearningPaths />
 
 {/* What You'll Learn */}
 
